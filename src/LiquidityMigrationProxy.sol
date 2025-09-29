@@ -19,22 +19,22 @@ contract LiquidityMigrationProxy is Multicallable, Ownable {
 
     /// @notice Migrates liquidity for a specific Coin to a new hook
     ///
-    /// @param creatorCoin The Coin contract to migrate liquidity for
+    /// @param coin The Coin contract to migrate liquidity for
     /// @param newHook The address of the new hook to migrate to
     /// @param additionalData Additional data to pass to the migration function
     ///
     /// @return The new PoolKey after migration
-    function migrateLiquidityForCoin(ICoin creatorCoin, address newHook, bytes calldata additionalData)
+    function migrateLiquidityForCoin(ICoin coin, address newHook, bytes calldata additionalData)
         external
         onlyOwner
         returns (PoolKey memory)
     {
-        return creatorCoin.migrateLiquidity(newHook, additionalData);
+        return coin.migrateLiquidity(newHook, additionalData);
     }
 
     /// @notice Revokes ownership for a specific Coin contract
-    /// @param creatorCoin The Coin contract to revoke ownership for
-    function revokeOwnershipForCoin(ICoin creatorCoin) external onlyOwner {
-        creatorCoin.revokeOwnership();
+    /// @param coin The Coin contract to revoke ownership for
+    function revokeOwnershipForCoin(ICoin coin) external onlyOwner {
+        coin.revokeOwnership();
     }
 }
