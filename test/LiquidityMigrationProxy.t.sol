@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {Currency} from "v4-core/types/Currency.sol";
 import {IHooks} from "v4-core/interfaces/IHooks.sol";
 import {PoolKey} from "v4-core/types/PoolKey.sol";
+import {PoolIdLibrary} from "v4-core/types/PoolId.sol";
 import {Test, console2} from "forge-std/Test.sol";
 
 import {ICoin} from "../src/ICoin.sol";
@@ -43,6 +44,10 @@ contract LiquidityMigrationProxyTest is Test {
         bytes memory additionalData = "";
 
         vm.prank(proxyOwner);
+        vm.expectEmit();
+        emit LiquidityMigrationProxy.LiquidityMigratedForCoin(
+            coin, newHook, mockPoolKey, PoolIdLibrary.toId(mockPoolKey)
+        );
         vm.expectCall(address(coin), abi.encodeCall(ICoin.migrateLiquidity, (newHook, additionalData)));
         vm.mockCall(
             address(coin), abi.encodeCall(ICoin.migrateLiquidity, (newHook, additionalData)), abi.encode(mockPoolKey)
@@ -66,6 +71,8 @@ contract LiquidityMigrationProxyTest is Test {
 
     function test_revokeOwnership_performsCallOnCoin() public {
         vm.prank(proxyOwner);
+        vm.expectEmit();
+        emit LiquidityMigrationProxy.OwnershipRevokedForCoin(coin);
         vm.expectCall(address(coin), abi.encodeCall(ICoin.revokeOwnership, ()));
         proxy.revokeOwnershipForCoin(coin);
     }
@@ -105,6 +112,10 @@ contract LiquidityMigrationProxyTest is Test {
             abi.encodeCall(LiquidityMigrationProxy.migrateLiquidityForCoin, (coin, newHook, additionalData));
 
         vm.prank(proxyOwner);
+        vm.expectEmit();
+        emit LiquidityMigrationProxy.LiquidityMigratedForCoin(
+            coin, newHook, mockPoolKey, PoolIdLibrary.toId(mockPoolKey)
+        );
         vm.expectCall(address(coin), abi.encodeCall(ICoin.migrateLiquidity, (newHook, additionalData)));
         vm.mockCall(
             address(coin), abi.encodeCall(ICoin.migrateLiquidity, (newHook, additionalData)), abi.encode(mockPoolKey)
@@ -140,6 +151,8 @@ contract LiquidityMigrationProxyTest is Test {
         encodedCalls[0] = abi.encodeCall(LiquidityMigrationProxy.revokeOwnershipForCoin, (coin));
 
         vm.prank(proxyOwner);
+        vm.expectEmit();
+        emit LiquidityMigrationProxy.OwnershipRevokedForCoin(coin);
         vm.expectCall(address(coin), abi.encodeCall(ICoin.revokeOwnership, ()));
         proxy.multicall(encodedCalls);
     }
